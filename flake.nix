@@ -1,29 +1,33 @@
 {
   description = "A very basic flake";
   inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.poetry2nix-src = {
+    url = "github:nix-community/poetry2nix";
+    inputs.nixpkgs.follows = "nixpkgs";
+    inputs.flake-utils.follows = "flake-utils";
+  };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, poetry2nix-src }:
     flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.${system};
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ poetry2nix-src.overlay ];
+        };
       in {
 
-        # TODO: use poetry2nix to link this with pyproject.toml
-        devShell = pkgs.mkShell {
-          buildInputs = with pkgs;
-            with pkgs.python38Packages; [
-              python
-              poetry
-              pyzmq
-              jupyterlab
-              numpy
-              scipy
-              pandas
-              XlsxWriter
-              httpx
-              python-dotenv
-              faker
-            ];
-        };
+        devShell = let
+          pyEnv = pkgs.poetry2nix.mkPoetryEnv {
+            projectDir = ./.;
 
+            overrides = pkgs.poetry2nix.overrides.withDefaults (final: prev: {
+              requests-unixsocket = prev.requests-unixsocket.overridePythonAttrs
+                (old: {
+                  nativeBuildInputs = (old.nativeBuildInputs or [ ])
+                    ++ [ final.pbr ];
+                });
+            });
+          };
+        in pyEnv.env;
       });
 }
