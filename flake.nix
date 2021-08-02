@@ -14,20 +14,25 @@
           inherit system;
           overlays = [ poetry2nix-src.overlay ];
         };
-      in {
 
-        devShell = let
-          pyEnv = pkgs.poetry2nix.mkPoetryEnv {
-            projectDir = ./.;
-
-            overrides = pkgs.poetry2nix.overrides.withDefaults (final: prev: {
-              requests-unixsocket = prev.requests-unixsocket.overridePythonAttrs
-                (old: {
-                  nativeBuildInputs = (old.nativeBuildInputs or [ ])
-                    ++ [ final.pbr ];
-                });
+        myOverrides = final: prev: {
+          requests-unixsocket = prev.requests-unixsocket.overridePythonAttrs
+            (old: {
+              nativeBuildInputs = (old.nativeBuildInputs or [ ])
+                ++ [ final.pbr ];
             });
-          };
-        in pyEnv.env;
-      });
+          jupyterlab = prev.jupyterlab.overridePythonAttrs (old: {
+            nativeBuildInputs = (old.nativeBuildInputs or [ ])
+              ++ [ final.jupyter-packaging ];
+
+            makeWrapperArgs = (old.makeWrapperArgs or [ ])
+              ++ [ "--set" "JUPYTERLAB_DIR" "$out/share/jupyter/lab" ];
+          });
+        };
+
+        myEnv = pkgs.poetry2nix.mkPoetryEnv {
+          projectDir = ./.;
+          overrides = pkgs.poetry2nix.overrides.withDefaults myOverrides;
+        };
+      in { devShell = myEnv.env; });
 }
