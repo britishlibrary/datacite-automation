@@ -34,5 +34,5 @@
           projectDir = ./.;
           overrides = pkgs.poetry2nix.overrides.withDefaults myOverrides;
         };
-      in { devShell = myEnv.env; });
+      in { devShell = pkgs.mkShell { buildInputs = [ myEnv pkgs.poetry ]; }; });
 }
