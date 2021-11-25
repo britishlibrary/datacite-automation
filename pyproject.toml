@@ -14,6 +14,8 @@ XlsxWriter = "^1.4.4"
 httpx = "^0.18.2"
 Faker = "^8.10.1"
 python-dotenv = "^0.18.0"
+dcrest = {git = "https://github.com/jezcope/dcrest.git", rev = "main"}
+altair = "^4.1.0"
 
 [tool.poetry.dev-dependencies]
 
