@@ -1,0 +1,3 @@
+[submodule "dcrest"]
+	path = dcrest
+	url = git@github.com:jezcope/dcrest.git
