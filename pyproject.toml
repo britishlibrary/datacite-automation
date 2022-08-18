@@ -5,17 +5,18 @@ description = ""
 authors = ["Jez Cope <jez.cope@bl.uk>"]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.10"
-jupyterlab = "^3.1.4"
-numpy = "^1.21.0"
-scipy = "~1.6.3"
-pandas = "^1.3.0"
-XlsxWriter = "^1.4.4"
-httpx = "^0.18.2"
-Faker = "^8.10.1"
-python-dotenv = "^0.18.0"
+python = ">=3.8,<=3.10"
+jupyterlab = "*"
+nbconvert = ">=6.3"
+numpy = "*"
+scipy = "*"
+pandas = "*"
+XlsxWriter = "*"
+httpx = "*"
+Faker = "*"
+python-dotenv = "*"
 dcrest = {git = "https://github.com/jezcope/dcrest.git", rev = "main"}
-altair = "^4.1.0"
+altair = "*"
 
 [tool.poetry.dev-dependencies]
 
