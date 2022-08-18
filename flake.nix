@@ -14,25 +14,28 @@
           inherit system;
           overlays = [ poetry2nix-src.overlay ];
         };
+        python = pkgs.python39.withPackages (py:
+          with py; [
+            jupyterlab
 
-        myOverrides = final: prev: {
-          requests-unixsocket = prev.requests-unixsocket.overridePythonAttrs
-            (old: {
-              nativeBuildInputs = (old.nativeBuildInputs or [ ])
-                ++ [ final.pbr ];
-            });
-          jupyterlab = prev.jupyterlab.overridePythonAttrs (old: {
-            nativeBuildInputs = (old.nativeBuildInputs or [ ])
-              ++ [ final.jupyter-packaging ];
+            numpy
+            scipy
+            pandas
+            XlsxWriter
 
-            makeWrapperArgs = (old.makeWrapperArgs or [ ])
-              ++ [ "--set" "JUPYTERLAB_DIR" "$out/share/jupyter/lab" ];
-          });
-        };
+            httpx
+            aiohttp
+            faker
+            python-dotenv
+            altair
+            munch
 
-        myEnv = pkgs.poetry2nix.mkPoetryEnv {
-          projectDir = ./.;
-          overrides = pkgs.poetry2nix.overrides.withDefaults myOverrides;
-        };
-      in { devShell = pkgs.mkShell { buildInputs = [ myEnv pkgs.poetry ]; }; });
+            (pkgs.poetry2nix.mkPoetryEditablePackage {
+              python = pkgs.python39;
+              projectDir = ./lib/dcrest;
+              editablePackageSources = { dcrest = ./lib/dcrest; };
+            })
+          ]);
+
+      in { devShell = with pkgs; mkShell { buildInputs = [ python ]; }; });
 }
